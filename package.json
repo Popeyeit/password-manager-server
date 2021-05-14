@@ -1,0 +1,33 @@
+{
+  "name": "password-manager-server",
+  "version": "1.0.0",
+  "description": "server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/index.js",
+    "dev": "nodemon ./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Popeyeit/password-manager-server.git"
+  },
+  "author": "popeyeit",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Popeyeit/password-manager-server/issues"
+  },
+  "homepage": "https://github.com/Popeyeit/password-manager-server#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^9.0.2",
+    "express": "^4.17.1",
+    "joi": "^17.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.12.9",
+    "mongoose-paginate-v2": "^1.3.17",
+    "nodemon": "^2.0.7",
+    "uuid": "^8.3.2",
+    "yargs": "^17.0.1"
+  }
+}
