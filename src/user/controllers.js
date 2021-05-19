@@ -212,28 +212,20 @@ exports.logoutUser = async (req, res, next) => {
 
 exports.verifyPassword = async (req, res, next) => {
   try {
-    const { verificationPassword } = req.params;
+    const { verificationId: verificationPassword } = req.params;
 
     const user = await userModel.findOne({ verificationPassword });
 
     if (!user) {
       return res.status(404).json('User not found');
     }
-    await userModel.findByIdAndUpdate(user.id, {
+    await userModel.findByIdAndUpdate(user._id, {
       verificationPassword: '',
       newPassword: '',
       password: user.newPassword,
     });
 
-    res
-      .status(200)
-      .json(
-        markup(
-          'http://localhost:3000/sign-in',
-          'Перейти на сайт',
-          'Вы успешно подтвердили email.',
-        ),
-      );
+    res.status(200).json('you have successfully confirmed your mail');
   } catch (error) {
     next(error);
   }
