@@ -45,6 +45,8 @@ class Server {
     this.server.use((err, req, res, next) => {
       const message = 'Oooops something went wrong. Try again later.';
       err.message = message;
+      console.log(err);
+
       res.status(500).json(err);
     });
   }

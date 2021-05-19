@@ -19,8 +19,13 @@ const msg = (email, link) => {
   };
 };
 
-const sendVerification = async (email, verificationToken) => {
-  const verificationLink = `${process.env.BASE_URL}/api/verify/${verificationToken}`;
+const sendVerification = async (
+  email,
+  verificationToken,
+  set = '/api/verify/',
+) => {
+  const verificationLink = `${process.env.BASE_URL}${set}${verificationToken}`;
+
   try {
     const res = await sgMail.send(msg(email, verificationLink));
   } catch (error) {}
@@ -28,8 +33,9 @@ const sendVerification = async (email, verificationToken) => {
 
 exports.recoverPassword = async (req, res, next) => {
   try {
-    const { email, password } = req;
+    const { email, password } = req.body;
     const user = await userModel.getUserByEmail(email);
+
     if (!user) {
       return res.status(404).json('User not found');
     }
@@ -42,7 +48,11 @@ exports.recoverPassword = async (req, res, next) => {
       { verificationPassword: uuid.v4(), newPassword: hashPassword },
       { new: true },
     );
-    sendVerification(result.email, result.verificationPassword);
+    sendVerification(
+      result.email,
+      result.verificationPassword,
+      'api/recover/password/',
+    );
     res.status(201).send('verify email');
   } catch (error) {
     next(error);
@@ -62,15 +72,7 @@ exports.verifyEmail = async (req, res, next) => {
       verificationToken: '',
     });
 
-    res
-      .status(200)
-      .json(
-        markup(
-          'http://localhost:3000/sign-in',
-          'Перейти на сайт',
-          'Вы успешно подтвердили email.',
-        ),
-      );
+    res.status(200).json('you have successfully confirmed your mail');
   } catch (error) {
     next(error);
   }

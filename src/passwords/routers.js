@@ -27,7 +27,6 @@ passwordRouter.delete(
   // handleValidate(passwordObjectId, 'params'),
   deletePassword,
 );
-module.exports = passwordRouter;
 
 passwordRouter.patch(
   '/:passwordId',
@@ -36,3 +35,5 @@ passwordRouter.patch(
   handleValidate(changePasswordRules),
   changePassword,
 );
+
+module.exports = passwordRouter;

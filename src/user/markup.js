@@ -1,4 +1,4 @@
-exports.markup = (
+const markup = (
   link,
   toSite = 'Link verification',
   text = 'Подтвердите свой email',
@@ -58,3 +58,5 @@ exports.markup = (
   </table>
 </body>`;
 };
+
+module.exports = markup;
