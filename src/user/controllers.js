@@ -117,7 +117,6 @@ exports.loginUser = async (req, res, next) => {
 exports.currentUser = async (req, res, next) => {
   try {
     const { user } = req;
-
     res.status(200).json({
       email: user.email,
     });

@@ -6,7 +6,7 @@ require('dotenv').config({
   path: path.join(__dirname, '../.env'),
 });
 const userRouter = require('./user/routers');
-// const passwordRouter = require('./password/routers');
+const passwordRouter = require('./passwords/routers');
 
 class Server {
   constructor() {
@@ -50,7 +50,7 @@ class Server {
   }
   initRoutes() {
     this.server.use('/api', userRouter);
-    // this.server.use('/api', passwordRouter);
+    this.server.use('/api/password', passwordRouter);
   }
   startListening() {
     this.server.listen(process.env.PORT || 5000, () => {
