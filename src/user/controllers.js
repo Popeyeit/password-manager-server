@@ -7,13 +7,17 @@ const markup = require('./markup');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const msg = (email, link) => ({
-  to: `${email}`,
-  from: process.env.EMAIL,
-  subject: 'Confirm your email',
-  text: 'Confirm your email',
-  html: markup(link),
-});
+const msg = (email, link) => {
+  const res = markup(link);
+
+  return {
+    to: `${email}`,
+    from: process.env.EMAIL,
+    subject: 'Confirm your email',
+    text: 'Confirm your email',
+    html: res,
+  };
+};
 
 const sendVerification = async (email, verificationToken) => {
   const verificationLink = `${process.env.BASE_URL}/api/verify/${verificationToken}`;
