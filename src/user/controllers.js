@@ -136,14 +136,6 @@ exports.registerUser = async (req, res, next) => {
       verificationToken: uuid.v4(),
     });
 
-    // const token = await jwt.sign(
-    //   {
-    //     uid: user._id,
-    //   },
-    //   process.env.JWT_SECRET,
-    // );
-    // await userModel.updateUserToken(user._id, token);
-
     await sendVerification(user.email, user.verificationToken);
 
     res.status(201).json({
