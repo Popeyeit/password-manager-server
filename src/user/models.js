@@ -17,6 +17,15 @@ const userSchema = new Schema({
     required: false,
     default: null,
   },
+  verificationToken: {
+    type: String,
+    required: false,
+  },
+  newPassword: { type: String, required: false, min: 6 },
+  verificationPassword: {
+    type: String,
+    required: false,
+  },
 });
 
 const getUserByEmail = async function (email) {

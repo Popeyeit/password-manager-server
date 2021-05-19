@@ -9,9 +9,16 @@ const {
   currentUser,
   logoutUser,
   authorize,
+  verifyEmail,
+  recoverPassword,
+  verifyPassword,
 } = require('./controllers');
 
-const { registerSchema, loginSchema } = require('./schemes');
+const {
+  registerSchema,
+  loginSchema,
+  recoverPasswordSchema,
+} = require('./schemes');
 
 userRouter.post(
   '/register',
@@ -23,5 +30,11 @@ userRouter.post(
 userRouter.post('/login', handleValidate(loginSchema), loginUser);
 userRouter.post('/logout', authorize, logoutUser);
 userRouter.get('/currentUser', authorize, currentUser);
-
+userRouter.get('/verify/:verificationToken', verifyEmail);
+userRouter.post(
+  '/recover/password',
+  handleValidate(recoverPasswordSchema),
+  recoverPassword,
+);
+userRouter.get('/recover/password/:verificationId', verifyPassword);
 module.exports = userRouter;

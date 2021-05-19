@@ -1,6 +1,76 @@
 const userModel = require('./models');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const uuid = require('uuid');
+const sgMail = require('@sendgrid/mail');
+const markup = require('./markup');
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+const msg = (email, link) => ({
+  to: `${email}`,
+  from: process.env.EMAIL,
+  subject: 'Confirm your email',
+  text: 'Confirm your email',
+  html: markup(link),
+});
+
+const sendVerification = async (email, verificationToken) => {
+  const verificationLink = `${process.env.BASE_URL}/api/verify/${verificationToken}`;
+  try {
+    const res = await sgMail.send(msg(email, verificationLink));
+  } catch (error) {}
+};
+
+exports.recoverPassword = async (req, res, next) => {
+  try {
+    const { email, password } = req;
+    const user = await userModel.getUserByEmail(email);
+    if (!user) {
+      return res.status(404).json('User not found');
+    }
+    const hashPassword = await bcrypt.hash(
+      password,
+      Number(process.env.BCRYPT_SALT),
+    );
+    const result = await userModel.findOneAndUpdate(
+      { email: email },
+      { verificationPassword: uuid.v4(), newPassword: hashPassword },
+      { new: true },
+    );
+    sendVerification(result.email, result.verificationPassword);
+    res.status(201).send('verify email');
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.verifyEmail = async (req, res, next) => {
+  try {
+    const { verificationToken } = req.params;
+
+    const user = await userModel.findOne({ verificationToken });
+
+    if (!user) {
+      return res.status(404).json('User not found');
+    }
+    await userModel.findByIdAndUpdate(user.id, {
+      verificationToken: '',
+    });
+
+    res
+      .status(200)
+      .json(
+        markup(
+          'http://localhost:3000/sign-in',
+          'Перейти на сайт',
+          'Вы успешно подтвердили email.',
+        ),
+      );
+  } catch (error) {
+    next(error);
+  }
+};
 
 exports.authorize = async (req, res, next) => {
   try {
@@ -63,18 +133,20 @@ exports.registerUser = async (req, res, next) => {
     const user = await userModel.create({
       email,
       password: hashPassword,
+      verificationToken: uuid.v4(),
     });
 
-    const token = await jwt.sign(
-      {
-        uid: user._id,
-      },
-      process.env.JWT_SECRET,
-    );
-    await userModel.updateUserToken(user._id, token);
+    // const token = await jwt.sign(
+    //   {
+    //     uid: user._id,
+    //   },
+    //   process.env.JWT_SECRET,
+    // );
+    // await userModel.updateUserToken(user._id, token);
+
+    await sendVerification(user.email, user.verificationToken);
 
     res.status(201).json({
-      token,
       email: user.email,
     });
   } catch (error) {
@@ -86,6 +158,11 @@ exports.loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const isUser = await userModel.getUserByEmail(email);
+
+    const { verificationToken } = isUser;
+    if (verificationToken) {
+      return res.status(403).json('Your email is not verified');
+    }
 
     if (!isUser) {
       return res.status(401).json('Email or password is wrong');
@@ -130,6 +207,35 @@ exports.logoutUser = async (req, res, next) => {
     const { user } = req;
     await userModel.updateUserToken(user.id, null);
     res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.verifyPassword = async (req, res, next) => {
+  try {
+    const { verificationPassword } = req.params;
+
+    const user = await userModel.findOne({ verificationPassword });
+
+    if (!user) {
+      return res.status(404).json('User not found');
+    }
+    await userModel.findByIdAndUpdate(user.id, {
+      verificationPassword: '',
+      newPassword: '',
+      password: user.newPassword,
+    });
+
+    res
+      .status(200)
+      .json(
+        markup(
+          'http://localhost:3000/sign-in',
+          'Перейти на сайт',
+          'Вы успешно подтвердили email.',
+        ),
+      );
   } catch (error) {
     next(error);
   }

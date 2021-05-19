@@ -1,4 +1,5 @@
 const PasswordModule = require('./models');
+const CryptoJS = require('crypto-js');
 
 exports.createPassword = async (req, res, next) => {
   try {
@@ -7,16 +8,24 @@ exports.createPassword = async (req, res, next) => {
     const { _id: id } = user;
     const { name, password, login } = body;
 
+    const ciphertext = CryptoJS.AES.encrypt(
+      password,
+      process.env.SECRET_CRYPTO,
+    ).toString();
+
     const result = await PasswordModule.create({
       name,
-      password,
+      password: ciphertext,
       login,
       owner: id,
     });
 
+    const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.SECRET_CRYPTO);
+    const originalPassword = bytes.toString(CryptoJS.enc.Utf8);
+
     res.status(201).send({
       name: result.name,
-      password: result.password,
+      password: originalPassword,
       login: result.login,
       id: result._id,
     });
@@ -31,12 +40,20 @@ exports.getPasswords = async (req, res, next) => {
     const { _id: id } = user;
 
     const result = await PasswordModule.find({ owner: id });
-    const response = result.map(passwordItem => ({
-      name: passwordItem.name,
-      password: passwordItem.password,
-      login: passwordItem.login,
-      id: passwordItem._id,
-    }));
+    const response = result.map(passwordItem => {
+      const bytes = CryptoJS.AES.decrypt(
+        passwordItem.password,
+        process.env.SECRET_CRYPTO,
+      );
+      const originalPassword = bytes.toString(CryptoJS.enc.Utf8);
+
+      return {
+        name: passwordItem.name,
+        password: originalPassword,
+        login: passwordItem.login,
+        id: passwordItem._id,
+      };
+    });
 
     res.status(200).json(response);
   } catch (error) {}
