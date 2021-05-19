@@ -51,7 +51,7 @@ exports.recoverPassword = async (req, res, next) => {
     sendVerification(
       result.email,
       result.verificationPassword,
-      'api/recover/password/',
+      '/api/recover/password/',
     );
     res.status(201).send('verify email');
   } catch (error) {
