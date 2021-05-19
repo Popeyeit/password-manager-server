@@ -6,15 +6,8 @@ exports.createPassword = Joi.object({
   login: Joi.string().required().min(1).max(20),
 });
 
-exports.passwordId = Joi.object({
+exports.passwordObjectId = Joi.object({
   passwordId: Joi.string().custom((value, helpers) => {
-    const isValidObjId = ObjectId.isValid(value);
-    if (!isValidObjId) {
-      return helpers.error('Invalid password id. Must be object id');
-    }
-    return value;
-  }),
-  dateId: Joi.string().custom((value, helpers) => {
     const isValidObjId = ObjectId.isValid(value);
     if (!isValidObjId) {
       return helpers.error('Invalid password id. Must be object id');

@@ -4,7 +4,7 @@ const { authorize } = require('../user/controllers');
 const { handleValidate } = require('../helpers/validate');
 const {
   createPassword: rulesCreatePassword,
-  passwordId,
+  passwordObjectId,
   changePasswordRules,
 } = require('./schemes');
 const {
@@ -24,7 +24,7 @@ passwordRouter.post(
 passwordRouter.delete(
   '/:passwordId',
   authorize,
-  handleValidate(passwordId, 'params'),
+  // handleValidate(passwordObjectId, 'params'),
   deletePassword,
 );
 module.exports = passwordRouter;
@@ -32,6 +32,7 @@ module.exports = passwordRouter;
 passwordRouter.patch(
   '/:passwordId',
   authorize,
-  handleValidate(passwordId, 'params'),
-  handleValidate(changePasswordRules, changePassword),
+  // handleValidate(passwordObjectId, 'params'),
+  handleValidate(changePasswordRules),
+  changePassword,
 );

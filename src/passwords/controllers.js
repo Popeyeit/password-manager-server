@@ -65,7 +65,12 @@ exports.changePassword = async (req, res, next) => {
       { ...body },
       { new: true },
     );
-    res.status(200).json(updatedResult);
+    res.status(200).json({
+      name: updatedResult.name,
+      password: updatedResult.password,
+      login: updatedResult.login,
+      id: updatedResult._id,
+    });
   } catch (error) {
     next(error);
   }
