@@ -155,16 +155,18 @@ exports.registerUser = async (req, res, next) => {
 exports.loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+
     const isUser = await userModel.getUserByEmail(email);
+
+    if (!isUser) {
+      return res.status(401).json('Email or password is wrong');
+    }
 
     const { verificationToken } = isUser;
     if (verificationToken) {
       return res.status(403).json('Your email is not verified');
     }
 
-    if (!isUser) {
-      return res.status(401).json('Email or password is wrong');
-    }
     const isPasswordCorrect = await bcrypt.compare(password, isUser.password);
 
     if (!isPasswordCorrect) {
