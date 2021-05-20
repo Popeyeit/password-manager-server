@@ -77,14 +77,20 @@ exports.changePassword = async (req, res, next) => {
   try {
     const { body } = req;
     const { passwordId } = req.params;
+
+    const ciphertext = CryptoJS.AES.encrypt(
+      body.password,
+      process.env.SECRET_CRYPTO,
+    ).toString();
+
     const updatedResult = await PasswordModule.findOneAndUpdate(
       { _id: passwordId },
-      { ...body },
+      { name: body.name, login: body.login, password: ciphertext },
       { new: true },
     );
     res.status(200).json({
       name: updatedResult.name,
-      password: updatedResult.password,
+      password: body.password,
       login: updatedResult.login,
       id: updatedResult._id,
     });
