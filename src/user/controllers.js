@@ -27,7 +27,7 @@ const sendVerification = async (
   const verificationLink = `${process.env.BASE_URL}${set}${verificationToken}`;
 
   try {
-    const res = await sgMail.send(msg(email, verificationLink));
+    await sgMail.send(msg(email, verificationLink));
   } catch (error) {}
 };
 
@@ -64,6 +64,7 @@ exports.verifyEmail = async (req, res, next) => {
     const { verificationToken } = req.params;
 
     const user = await userModel.findOne({ verificationToken });
+    console.log(user);
 
     if (!user) {
       return res.status(404).json('User not found');
@@ -72,7 +73,7 @@ exports.verifyEmail = async (req, res, next) => {
       verificationToken: '',
     });
 
-    res.status(200).json('you have successfully confirmed your mail');
+    res.redirect('https://popeye-password-manager.netlify.app/sign-in');
   } catch (error) {
     next(error);
   }
@@ -227,7 +228,7 @@ exports.verifyPassword = async (req, res, next) => {
       password: user.newPassword,
     });
 
-    res.status(200).json('you have successfully confirmed your mail');
+    res.redirect('https://popeye-password-manager.netlify.app/sign-in');
   } catch (error) {
     next(error);
   }
