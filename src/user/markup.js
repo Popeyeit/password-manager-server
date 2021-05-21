@@ -45,7 +45,7 @@ const markup = (
                 <tr>
                   <td style="padding:0;width:50%;" align="left">
                     <p style="margin:0;font-size:14px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;">
-                      &reg; Тестовое задание, Одесса, Украина.
+                      &reg; Тестовое задание.
                     </p>
                   </td>
                 </tr>
